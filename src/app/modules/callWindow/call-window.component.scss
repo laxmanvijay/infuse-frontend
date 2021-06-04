@@ -52,19 +52,45 @@
         }
     }
 
-    .avatar {
-        background-color: white;
-        border-radius: 50%;
+    .avatar-container {
+        position: relative;
         height: 100px;
         width: 100px;
-        font-size: 32px;
 
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        .volume-indicator {
+            border-radius: 50%;
+            height: 110px;
+            width: 110px;
+            border-style: solid;
+            border-color:  #044063;
+            transition: border-width 100ms linear;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-        border: 10px solid rgb(4, 64, 99);
-        outline: 2px solid black;
+        .avatar {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            height: 100px;
+            width: 100px;
+            font-size: 32px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 10px solid #044063;
+        
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            &.no-border {
+                border: none;
+            }
+        }
     }
 
     .line {

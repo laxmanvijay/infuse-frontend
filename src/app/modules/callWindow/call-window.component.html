@@ -3,24 +3,29 @@
     <video class="video-el own-video-el" #ownvideoel *ngIf="isVideoOn"></video>
     <audio id="audio-el" style="display: none;"></audio>
     <p class="text">{{statusText}}</p>
-    <div class="avatar">
-        <p>{{contact?.name | firstTwoLetters}}</p>
+    <div class="avatar-container">
+        <div class="volume-indicator" *ngIf="!contact?.muted" [ngStyle]="{'border-width': contact?.calculatedBorderWidth + 'px'}"></div>
+        <div class="avatar" [class.no-border]="contact?.muted">
+            <p>{{contact?.name | firstTwoLetters}}</p>
+        </div>
     </div>
     <div class="line"></div>
     <div class="controls">
-        <div class="control" (click)="toggleAudio()">
-            <img src="assets/icons/mic_off.svg" alt="" *ngIf="!isAudioOn">
-            <img src="assets/icons/mic_on.svg" alt="" *ngIf="isAudioOn">
-        </div>
-        <div class="control" (click)="toggleVideo()">
-            <img src="assets/icons/videocam_off.svg" alt="" *ngIf="!isVideoOn">
-            <img src="assets/icons/videocam_on.svg" alt="" *ngIf="isVideoOn">
-        </div>
-        <div class="control" (click)="toggleScreenShare()">
-            <img src="assets/icons/desktop_off.svg" alt="" *ngIf="!isScreenShareOn">
-            <img src="assets/icons/desktop_on.svg" alt="" *ngIf="isScreenShareOn">
-        </div>
-        <div class="control call-end" (click)="backToHome()">
+        <ng-container *ngIf="isConnected">
+            <div class="control" (click)="toggleAudio()">
+                <img src="assets/icons/mic_off.svg" alt="" *ngIf="!isAudioOn">
+                <img src="assets/icons/mic_on.svg" alt="" *ngIf="isAudioOn">
+            </div>
+            <div class="control" (click)="toggleVideo()">
+                <img src="assets/icons/videocam_off.svg" alt="" *ngIf="!isVideoOn">
+                <img src="assets/icons/videocam_on.svg" alt="" *ngIf="isVideoOn">
+            </div>
+            <div *ngIf="!isOtherScreenShareOn" class="control" (click)="toggleScreenShare()">
+                <img src="assets/icons/desktop_off.svg" alt="" *ngIf="!isScreenShareOn">
+                <img src="assets/icons/desktop_on.svg" alt="" *ngIf="isScreenShareOn">
+            </div>
+        </ng-container>
+        <div class="control call-end" (click)="setStatusText('Disconnected...');backToHome()">
             <img src="assets/icons/call_end.svg" alt="">
         </div>
     </div>

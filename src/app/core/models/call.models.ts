@@ -18,7 +18,10 @@ export interface IContact {
   self?: boolean,
   tileId?: number,
   screenShareTileId?: number,
-  attendeeId?: string
+  attendeeId?: string,
+  volume?: number,
+  muted?: boolean,
+  calculatedBorderWidth?: number
 }
 
 export interface IConnection {

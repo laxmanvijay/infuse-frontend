@@ -41,6 +41,7 @@ export class CallWindowComponent implements OnInit, OnDestroy {
   public showLoader: boolean;
 
   public statusText = '';
+  public isConnected = false;
 
   public timeoutExpiryNotifier$ = new Subject<void>();
   public destroyNotifier$ = new Subject<void>();
@@ -64,6 +65,7 @@ export class CallWindowComponent implements OnInit, OnDestroy {
 
       // tileState.boundAttendeeId is formatted as "attendee-id#content".
       const boundAttendeeId = tileState.boundAttendeeId;
+      this.callService.setTileIdAttendeeEntry(tileState.tileId, tileState.boundAttendeeId);
       if (boundAttendeeId.includes("#content")) {
         const baseAttendeeId = new DefaultModality(boundAttendeeId).base();
         if (baseAttendeeId !== yourAttendeeId) {
@@ -91,13 +93,16 @@ export class CallWindowComponent implements OnInit, OnDestroy {
       }
     },
     videoTileWasRemoved: tileId => {
-      if (tileId === this.contact.tileId) {
+      console.log("videoTileWasRemoved called");
+      
+      if (this.callService.getTileIdAttendeeEntry(tileId).includes("#content")) {
+        if (!this.callService.getTileIdAttendeeEntry(tileId).includes(this.meetingSession.configuration.credentials.attendeeId)) {
+          this.isOtherScreenShareOn = false;
+        } else {
+          this.toggleScreenShare();
+        }
+      } else if (this.meetingSession.configuration.credentials.attendeeId !== this.callService.getTileIdAttendeeEntry(tileId)) {
         this.isOtherVideoOn = false;
-        return;
-      }
-      if (tileId === this.contact.screenShareTileId) {
-        this.isOtherScreenShareOn = false;
-        return;
       }
     }
   };
@@ -107,8 +112,8 @@ export class CallWindowComponent implements OnInit, OnDestroy {
       console.log("content share started"); 
     },
     contentShareDidStop: () => {
-      this.isOtherScreenShareOn = false;
-      if (this.isScreenShareOn) this.isScreenShareOn = false;
+      console.log("contentshare did stop called");
+      this.toggleScreenShare();
     }
   };
 
@@ -122,8 +127,7 @@ export class CallWindowComponent implements OnInit, OnDestroy {
     this.contact = this.callService.caller;
     if (this.callService.currentState.value === TypeOfMessage.callAcceptedAndMeetingCreated) {
       console.log("inside create meeting");
-      
-      this.showLoader = true;
+      this.statusText = "Connecting...";
       this.callService.createOrJoinMeeting({
         type: TypeOfMessage.createMeeting,
         data: {
@@ -158,13 +162,15 @@ export class CallWindowComponent implements OnInit, OnDestroy {
         this.meetingSession.audioVideo.addContentShareObserver(this.contentShareObserver);
         console.log("done creation", this.meetingSession, this.meetingSession.audioVideo.realtimeIsLocalAudioMuted());
         this.setStatusText("Call Connected...");
+        this.attendeeSubscription();
+        this.isConnected = true;
       });
 
       this.callService.getSocketConnection()
         .subscribe(x => {
           if ((x.type === TypeOfMessage.callTerminate)) {
             this.setStatusText("Disconnected...");
-            of(1).pipe(delay(3000)).subscribe(() => {
+            of(1).pipe(delay(1500)).subscribe(() => {
               this.backToHome();
             });
           }
@@ -184,14 +190,18 @@ export class CallWindowComponent implements OnInit, OnDestroy {
           id: this.ownContact.id
         });
         this.callingAudio.play();
-
+        this.statusText = "Ringing...";
         this.callService.getSocketConnection()
           .subscribe(x => {
             console.log("socky", x);
             
             if (((x.type === TypeOfMessage.callBusy || x.type === TypeOfMessage.reject || x.type === TypeOfMessage.callTerminate))) {
-              this.setStatusText("Disconnected...");
-              of(1).pipe(delay(3000)).subscribe(() => {
+              if (x.type === TypeOfMessage.callBusy || x.type === TypeOfMessage.reject) {
+                this.setStatusText("Line Busy...");
+              } else {
+                this.setStatusText("Disconnected...");
+              }
+              of(1).pipe(delay(1500)).subscribe(() => {
                 this.backToHome();
               });
             } else if (x.type === TypeOfMessage.callAcceptedAndMeetingCreated) {
@@ -215,12 +225,45 @@ export class CallWindowComponent implements OnInit, OnDestroy {
                 this.meetingSession.audioVideo.addObserver(this.observer);
                 this.setStatusText("Call Connected...");
                 console.log("joined meeting", this.meetingSession);
-                
+                this.attendeeSubscription();
+                this.isConnected = true;
               });
             }
           });
       }
     }
+  }
+
+  private attendeeSubscription(): void {
+    this.subscribeToVolumeChanges(this.meetingSession.configuration.credentials.attendeeId);
+    this.meetingSession.audioVideo.realtimeSubscribeToAttendeeIdPresence((attendeeId: string, present: boolean) => {
+      console.log("attendee presence", attendeeId, present);
+      if (present) {
+        this.subscribeToVolumeChanges(attendeeId);
+      } else {
+        this.callService.removeFromAttendeeList(attendeeId);
+      }
+    });
+  }
+
+  private subscribeToVolumeChanges(attendeeId: string): void {
+    this.meetingSession.audioVideo.realtimeSubscribeToVolumeIndicator(attendeeId, (attendeeId,volume, muted, signalStrength) => {
+      console.log("recieved volume data", attendeeId, this.meetingSession.configuration.credentials.attendeeId, volume, muted, signalStrength);
+      
+      this.callService.insertIntoAttendeeList(attendeeId, {
+        volume,
+        muted, 
+        signalStrength
+      });
+      if (this.meetingSession.configuration.credentials.attendeeId !== attendeeId) {
+        this.contact.volume = volume;
+        this.contact.muted = muted;
+        this.contact.calculatedBorderWidth = (30 * (volume));
+      } else {
+        this.ownContact.volume = volume;
+        this.ownContact.calculatedBorderWidth = (30 * (volume));
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -266,13 +309,19 @@ export class CallWindowComponent implements OnInit, OnDestroy {
   }
 
   async toggleScreenShare(): Promise<void> {
+    console.log("calling toggleScreenShare with state", this.isScreenShareOn);
     if (!this.isScreenShareOn) {
-      const mediaStream = await this.meetingSession.audioVideo.startContentShareFromScreenCapture();
-      this.isScreenShareOn = !!mediaStream;
+      try {
+        await this.meetingSession.audioVideo.startContentShareFromScreenCapture();
+        this.isScreenShareOn = true;
+      } catch(err) {
+        this.isScreenShareOn = false;
+      }
     } else {
       this.meetingSession.audioVideo.stopContentShare();
       this.isScreenShareOn = false;
     }
+    console.log("ending toggleScreenShare with state", this.isScreenShareOn);
   }
   
   async toggleVideo(): Promise<void> {

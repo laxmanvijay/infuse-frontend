@@ -19,6 +19,10 @@ export class CallService {
 
   private meetingSession: MeetingSession;
 
+  private tileIdAttendeeIdMap: {number?: string} = {};
+
+  private attendeeProperties: {string?: any} = {};
+
   public currentState = new BehaviorSubject<TypeOfMessage>(TypeOfMessage.available);
 
   public caller: IContact;
@@ -78,5 +82,21 @@ export class CallService {
         return undefined;
     }
     return this.meetingSession;
+  }
+
+  public setTileIdAttendeeEntry(tileId: number, attendeeId: string): void {
+    this.tileIdAttendeeIdMap[tileId] = attendeeId;
+  }
+
+  public getTileIdAttendeeEntry(tileId: number): string {
+    return this.tileIdAttendeeIdMap[tileId];
+  }
+
+  public insertIntoAttendeeList(attendeeId: string, prop: any = {}): void {
+    this.attendeeProperties[attendeeId] = prop;
+  }
+
+  public removeFromAttendeeList(attendeeId: string): void {
+    delete this.attendeeProperties[attendeeId];
   }
 }
