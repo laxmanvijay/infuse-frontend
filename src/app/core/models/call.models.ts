@@ -16,7 +16,9 @@ export interface IContact {
   id?: string,
   name?: string,
   self?: boolean,
-  tileId?: number
+  tileId?: number,
+  screenShareTileId?: number,
+  attendeeId?: string
 }
 
 export interface IConnection {
