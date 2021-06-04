@@ -11,10 +11,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { HomeModule } from './home/home.module';
-import { DetailModule } from './detail/detail.module';
+import { HomeModule } from './modules/home/home.module';
 
 import { AppComponent } from './app.component';
+import { CallWindowModule } from './modules/callWindow/callWindow.module';
+import { LoginModule } from "./modules/login/login.module";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -30,7 +31,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CoreModule,
     SharedModule,
     HomeModule,
-    DetailModule,
+    CallWindowModule,
+    LoginModule,
     AppRoutingModule,
     TranslateModule.forRoot({
       loader: {

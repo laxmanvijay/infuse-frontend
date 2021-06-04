@@ -1,0 +1,37 @@
+<div class="home">
+  <div class="incoming-call" *ngIf="incomingCall">
+    <p>Incoming call...</p>
+    <p *ngIf="incomingCallContact">{{incomingCallContact.name}}</p>
+    <p *ngIf="!incomingCallContact">Unknown Caller</p>
+    <div class="d-flex icons">
+      <img src="assets/icons/call.svg" alt="" (click)="attendIncomingCall()">
+      <img src="assets/icons/call_end.svg" alt="" (click)="rejectIncomingCall()">
+    </div>
+  </div>
+  <div class="contacts-container">
+    <div class="d-flex space-between align-center mt-20">
+      <p class="header">Contacts</p>
+      <img src="assets/icons/add_circle.svg" class="add" alt="" (click)="showAddContactPanel = !showAddContactPanel">
+    </div>
+    <div class="add-contact-panel d-flex" [ngStyle]="{'height': showAddContactPanel ? '170px':'0'}">
+      <input type="text" name="" placeholder="Nickname" class="input" [class.error]="addContactError && nickname.length < 1" [(ngModel)]="nickname">
+      <input type="text" name="" placeholder="10 Digit ID" class="input" [class.error]="addContactError && id.length < 1" [(ngModel)]="id">
+      <input type="submit" value="Add" (click)="addContact()" class="button outline">
+      <hr>
+    </div>
+    <input type="text" class="input search" placeholder="Search Contacts" [(ngModel)]="searchText" (keyup)="search()">
+    <div class="contacts">
+      <app-contact [contact]="ownContact"></app-contact>
+      <app-contact *ngFor="let contact of contactsToShow" [contact]="contact" (deleteEventEmitter)="deleteContact($event)"></app-contact>
+    </div>
+  </div>
+  <div class="video-content">
+    <video id="background-video" #video *ngIf="isVideoOn"></video>
+    <div class="controls">
+      <div class="toggle video-toggle" (click)="toggleVideo()" [class.invert]="!isVideoOn">
+        <img src="assets/icons/videocam_on.svg" alt="" *ngIf="!isVideoOn">
+        <img src="assets/icons/videocam_off.svg" alt="" *ngIf="isVideoOn" style="filter: none;">
+      </div>
+    </div>
+  </div>
+</div>

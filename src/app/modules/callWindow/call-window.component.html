@@ -1,0 +1,23 @@
+<div class="call-window" [class.other-video-on]="isOtherVideoOn">
+    <video class="video-el other-video-el" #othervideoel></video>
+    <video class="video-el own-video-el" #ownvideoel *ngIf="isVideoOn"></video>
+    <audio id="audio-el" style="display: none;"></audio>
+    <p *ngIf="isLineBusy" class="text">Line Busy...</p>
+    <div class="avatar">
+        <p>{{contact?.name | firstTwoLetters}}</p>
+    </div>
+    <div class="line"></div>
+    <div class="controls">
+        <div class="control" (click)="toggleAudio()">
+            <img src="assets/icons/mic_off.svg" alt="" *ngIf="!isAudioOn">
+            <img src="assets/icons/mic_on.svg" alt="" *ngIf="isAudioOn">
+        </div>
+        <div class="control" (click)="toggleVideo()">
+            <img src="assets/icons/videocam_off.svg" alt="" *ngIf="!isVideoOn">
+            <img src="assets/icons/videocam_on.svg" alt="" *ngIf="isVideoOn">
+        </div>
+        <div class="control call-end" (click)="backToHome()">
+            <img src="assets/icons/call_end.svg" alt="">
+        </div>
+    </div>
+</div>

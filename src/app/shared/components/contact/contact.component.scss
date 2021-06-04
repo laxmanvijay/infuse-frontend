@@ -1,0 +1,54 @@
+.contact-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 20px 0;
+
+    &:hover {
+        .options {
+            display: block;
+        }
+    }
+
+    .details {
+        & p{
+            margin: 0;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .name {
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 1.2px;
+        }
+
+        .id {
+            font-size: 12px;
+            font-weight: 100;
+            letter-spacing: 1.2px;
+        }
+    }
+
+    .options {
+        margin-right: 2.5vw;
+        display: none;
+        img {
+            filter: invert(1);
+            margin-right: 10px;
+
+            &:active {
+                filter: var(--filter-green);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 500px) { 
+    .contact-card {
+        .options {
+            display: block;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+<div class="login-container">
+    <div class="container">
+        <ng-container *ngIf="step === '1'">
+            <label for="email">Email</label>
+            <input type="email" placeholder="example@gmail.com" class="input">
+            <input type="submit" value="Next" class="button" (click)="step = '2'">
+        </ng-container>
+        <ng-container *ngIf="step === '2'">
+            <label for="email">Enter 6 Digit Code</label>
+            <input type="text" placeholder="123456" class="input">
+            <p class="low-priority-text resend">Resend Code</p>
+            <input type="submit" value="Login" class="button" (click)="login()">
+            <p class="low-priority-text" (click)="step = '1'">Back</p>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+.generateid-container {
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    p {
+        font-family: 'Nunito', sans-serif;
+        font-size: 24px;
+        font-weight: 200;
+        color: white;
+    }
+}

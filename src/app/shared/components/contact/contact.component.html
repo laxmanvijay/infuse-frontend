@@ -1,0 +1,10 @@
+<div class="contact-card">
+    <div class="details">
+        <p class="name">{{contact.name}}</p>
+        <p class="id">{{contact.id}}</p>
+    </div>
+    <div class="options" *ngIf="!contact.self">
+        <img src="assets/icons/delete.svg" alt="" (click)="deleteEventEmitter.emit(contact)">
+        <img src="assets/icons/call.svg" alt="" (click)="beginCall()">
+    </div>
+</div>

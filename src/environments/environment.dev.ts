@@ -1,4 +1,6 @@
 export const AppConfig = {
   production: false,
-  environment: 'DEV'
+  environment: 'DEV',
+  api_url: 'https://8khkj4pgol.execute-api.us-east-1.amazonaws.com/dev',
+  ws_url: 'wss://5x9esrdand.execute-api.us-east-1.amazonaws.com/dev'
 };

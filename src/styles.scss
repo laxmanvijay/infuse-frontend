@@ -1,49 +1,58 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,400&display=swap');
+
 html, body {
   margin: 0;
   padding: 0;
 
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-app-region: drag;
+  overflow: hidden;
+
+  --filter-green: invert(53%) sepia(76%) saturate(3400%) hue-rotate(86deg) brightness(90%) contrast(75%);
+  --filter-red: invert(9%) sepia(83%) saturate(7476%) hue-rotate(1deg) brightness(90%) contrast(109%);
 }
 
-/* CAN (MUST) BE REMOVED ! Sample Global style */
-.container {
-  height: 100%;
+.d-flex {
   display: flex;
-  flex-direction: column;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.space-around {
+  justify-content: space-around;
+}
+
+.align-center {
   align-items: center;
-  justify-content: center;
+}
 
-  background: url(./assets/background.jpg) no-repeat center fixed;
-  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
-  background-size: cover; /* version standardisée */
+.mt-20 {
+  margin: 20px 0;
+}
 
-  .title {
+.button {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding: 10px 30px;
+  border: 1px solid rgb(63, 63, 63);
+  background-color: white;
+  color: black;
+  font-size: 18px;
+  outline: none;
+
+  &:active {
+      filter: brightness(0.8);
+  }
+
+  &.outline {
+    background-color: transparent;
+    border: 2px solid white;
     color: white;
-    margin: 0;
-    padding: 50px 20px;
+    font-size: 16px;
   }
 
-  a {
-    color: #fff !important;
-    text-transform: uppercase;
-    text-decoration: none;
-    background: #ed3330;
-    padding: 20px;
-    border-radius: 5px;
-    display: inline-block;
-    border: none;
-    transition: all 0.4s ease 0s;
-
-    &:hover {
-      background: #fff;
-      color: #ed3330 !important;
-      letter-spacing: 1px;
-      -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
-      transition: all 0.4s ease 0s;
-    }
-  }
 }
