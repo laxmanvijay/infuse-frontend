@@ -4,7 +4,7 @@ import { AppConfig } from '../../../environments/environment';
 import { IContact, ICreateOrJoinMeetingResponse, IMessage, TypeOfMessage } from '../models/call.models';
 
 import { WebSocketSubject } from 'rxjs/webSocket';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Meeting } from 'aws-sdk/clients/chime';
 import { Attendee, ConsoleLogger, DefaultDeviceController, DefaultMeetingSession, LogLevel, MeetingSession, MeetingSessionConfiguration } from 'amazon-chime-sdk-js';
 
@@ -24,6 +24,8 @@ export class CallService {
   private attendeeProperties: {string?: any} = {};
 
   public currentState = new BehaviorSubject<TypeOfMessage>(TypeOfMessage.available);
+
+  public clearDrawing$ = new Subject<void>();
 
   public caller: IContact;
 

@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AudioVideoObserver, ContentShareObserver, DefaultModality, MeetingSession } from 'amazon-chime-sdk-js';
 import { of, Subject } from 'rxjs';
@@ -13,7 +13,7 @@ import { CallService } from '../../core/services/call.service';
   templateUrl: './call-window.component.html',
   styleUrls: ['./call-window.component.scss']
 })
-export class CallWindowComponent implements OnInit, OnDestroy {
+export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private router: Router,private activatedRoute: ActivatedRoute, private location: Location, private callService: CallService) { }
 
@@ -42,6 +42,8 @@ export class CallWindowComponent implements OnInit, OnDestroy {
 
   public statusText = '';
   public isConnected = false;
+
+  public isMobile = false;
 
   public timeoutExpiryNotifier$ = new Subject<void>();
   public destroyNotifier$ = new Subject<void>();
@@ -234,10 +236,15 @@ export class CallWindowComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit(): void {
+    if (window.innerWidth < 500) {
+      this.isMobile = true;
+    }
+  }
+
   private attendeeSubscription(): void {
     this.subscribeToVolumeChanges(this.meetingSession.configuration.credentials.attendeeId);
     this.meetingSession.audioVideo.realtimeSubscribeToAttendeeIdPresence((attendeeId: string, present: boolean) => {
-      console.log("attendee presence", attendeeId, present);
       if (present) {
         this.subscribeToVolumeChanges(attendeeId);
       } else {
@@ -248,8 +255,6 @@ export class CallWindowComponent implements OnInit, OnDestroy {
 
   private subscribeToVolumeChanges(attendeeId: string): void {
     this.meetingSession.audioVideo.realtimeSubscribeToVolumeIndicator(attendeeId, (attendeeId,volume, muted, signalStrength) => {
-      console.log("recieved volume data", attendeeId, this.meetingSession.configuration.credentials.attendeeId, volume, muted, signalStrength);
-      
       this.callService.insertIntoAttendeeList(attendeeId, {
         volume,
         muted, 
@@ -340,5 +345,9 @@ export class CallWindowComponent implements OnInit, OnDestroy {
       console.log("video turned off");
     }
     console.log("ending toggleVideo with state", this.isVideoOn);
+  }
+
+  clearDrawing(): void {
+    this.callService.clearDrawing$.next();
   }
 }

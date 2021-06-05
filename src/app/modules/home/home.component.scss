@@ -99,6 +99,7 @@
   .video-content {
     flex: 5;
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     background-color: black;
     position: relative;
 
@@ -157,6 +158,7 @@
 
     .contacts-container {
       height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
       padding-left: 4.5vw;
     }
 

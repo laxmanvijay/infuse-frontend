@@ -1,7 +1,7 @@
 <div class="call-window" [class.other-video-on]="isOtherVideoOn || isOtherScreenShareOn">
     <video class="video-el other-video-el" #othervideoel [class.screen-share]="isOtherScreenShareOn"></video>
     <video class="video-el own-video-el" #ownvideoel *ngIf="isVideoOn"></video>
-    <app-draw></app-draw>
+    <app-draw *ngIf="!isMobile && isOtherScreenShareOn" [isConnected]="isConnected"></app-draw>
     <audio id="audio-el" style="display: none;"></audio>
     <p class="text">{{statusText}}</p>
     <div class="avatar-container" [class.screen-share]="isOtherScreenShareOn">
@@ -21,9 +21,12 @@
                 <img src="assets/icons/videocam_off.svg" alt="" *ngIf="!isVideoOn">
                 <img src="assets/icons/videocam_on.svg" alt="" *ngIf="isVideoOn">
             </div>
-            <div *ngIf="!isOtherScreenShareOn" class="control" (click)="toggleScreenShare()">
+            <div *ngIf="!isMobile && !isOtherScreenShareOn" class="control" (click)="toggleScreenShare()">
                 <img src="assets/icons/desktop_off.svg" alt="" *ngIf="!isScreenShareOn">
                 <img src="assets/icons/desktop_on.svg" alt="" *ngIf="isScreenShareOn">
+            </div>
+            <div *ngIf="!isMobile" class="control" (click)="clearDrawing()">
+                <img src="assets/icons/hide_image.svg" alt="">
             </div>
         </ng-container>
         <div class="control call-end" (click)="setStatusText('Disconnected...');backToHome()">
