@@ -1,9 +1,10 @@
 <div class="call-window" [class.other-video-on]="isOtherVideoOn || isOtherScreenShareOn">
-    <video class="video-el other-video-el" #othervideoel></video>
+    <video class="video-el other-video-el" #othervideoel [class.screen-share]="isOtherScreenShareOn"></video>
     <video class="video-el own-video-el" #ownvideoel *ngIf="isVideoOn"></video>
+    <app-draw></app-draw>
     <audio id="audio-el" style="display: none;"></audio>
     <p class="text">{{statusText}}</p>
-    <div class="avatar-container">
+    <div class="avatar-container" [class.screen-share]="isOtherScreenShareOn">
         <div class="volume-indicator" *ngIf="!contact?.muted" [ngStyle]="{'border-width': contact?.calculatedBorderWidth + 'px'}"></div>
         <div class="avatar" [class.no-border]="contact?.muted">
             <p>{{contact?.name | firstTwoLetters}}</p>
