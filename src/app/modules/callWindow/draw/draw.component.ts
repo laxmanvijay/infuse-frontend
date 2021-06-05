@@ -60,7 +60,7 @@ export class DrawComponent implements OnInit, OnChanges, AfterViewInit {
       this.callService.getMeetingSession()?.audioVideo.realtimeSubscribeToReceiveDataMessage(DRAW_DATA, (dataMessage) => {
         const msg = <DrawMessageFormat>dataMessage.json();
         const xMultiplied = msg.x * window.innerWidth;
-        const yMultiplied = msg.y * window.innerWidth;
+        const yMultiplied = msg.y * window.innerHeight;
         if (!msg.isContinuation) {
           this.context2.beginPath();
           this.context2.moveTo(xMultiplied, yMultiplied);
