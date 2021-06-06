@@ -1,11 +1,13 @@
 import { Location } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AudioVideoObserver, ContentShareObserver, DefaultModality, MeetingSession } from 'amazon-chime-sdk-js';
+import { AudioVideoObserver, ContentShareObserver, DefaultModality, DefaultVideoTransformDevice, MeetingSession, VideoTransformDevice } from 'amazon-chime-sdk-js';
 import { of, Subject } from 'rxjs';
 import { delay, switchMap, tap } from 'rxjs/operators';
+import { SunGlassARModel } from '../../core/ARModels/SunGlassARModel';
 import { CallState } from '../../core/constants/callWindow.constants';
 import { IContact, TypeOfMessage } from '../../core/models/call.models';
+import { ARStickerProcessor } from '../../core/processors/video/ARStickerProcessor';
 import { CallService } from '../../core/services/call.service';
 
 @Component({
@@ -15,7 +17,7 @@ import { CallService } from '../../core/services/call.service';
 })
 export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    constructor(private router: Router,private activatedRoute: ActivatedRoute, private location: Location, private callService: CallService) { }
+    constructor(private router: Router,private activatedRoute: ActivatedRoute, private location: Location, private callService: CallService, private renderer: Renderer2) { }
 
     private callingAudio: HTMLAudioElement;
 
@@ -53,6 +55,8 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
         id: localStorage.getItem('id'),
         self: true
     };
+
+    private ARVideoTransformDevice: VideoTransformDevice;
 
     @ViewChild('othervideoel') private otherVideoElement: ElementRef<HTMLVideoElement>;
     @ViewChild('ownvideoel') private ownVideoElement: ElementRef<HTMLVideoElement>;
@@ -334,8 +338,18 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.isVideoOn) {
             const devices = await this.meetingSession.audioVideo.listVideoInputDevices();
             console.log("available devices", devices);
+
+            const model = new SunGlassARModel();
+            await model.loadModel();
+
+            const arProcessor = new ARStickerProcessor(model, this.renderer);
+            arProcessor.init();
+
+            const stages = [arProcessor];
+
+            this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId,stages);
       
-            await this.meetingSession.audioVideo.chooseVideoInputDevice(devices[0].deviceId);
+            await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
             this.ownContact.tileId = this.meetingSession.audioVideo.startLocalVideoTile();
             console.log("video started", this.ownContact);
             this.isVideoOn = true;
