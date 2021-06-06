@@ -5,36 +5,36 @@ import { map } from 'rxjs/operators';
 import { HomeHttpService } from '../services/home.http.service';
 
 export interface CanComponentDeactivate {
-  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+    canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
 }
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router, private homeService: HomeHttpService) {}
+    constructor(private router: Router, private homeService: HomeHttpService) {}
 
-  canActivate(_route: ActivatedRouteSnapshot, _state:RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    if (localStorage.getItem("id") != undefined && localStorage.getItem("hashedId") != undefined) {
-      return this.homeService.validateUniqueId(localStorage.getItem("id"), localStorage.getItem("hashedId")).pipe(map(x => x.response));
-    } else {
-      this.router.navigateByUrl('');
+    canActivate(_route: ActivatedRouteSnapshot, _state:RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+        if (localStorage.getItem("id") != undefined && localStorage.getItem("hashedId") != undefined) {
+            return this.homeService.validateUniqueId(localStorage.getItem("id"), localStorage.getItem("hashedId")).pipe(map(x => x.response));
+        } else {
+            this.router.navigateByUrl('');
+        }
+        return false;
     }
-    return false;
-  }
 }
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class DeactivateAuthGuard implements CanDeactivate<CanComponentDeactivate> {
   
-  constructor(private router: Router, private homeService: HomeHttpService) {}
+    constructor(private router: Router, private homeService: HomeHttpService) {}
   
-  canDeactivate(_component: CanComponentDeactivate, _route: ActivatedRouteSnapshot, _state: RouterStateSnapshot) {
-    console.log(_state, _route);
+    canDeactivate(_component: CanComponentDeactivate, _route: ActivatedRouteSnapshot, _state: RouterStateSnapshot) {
+        console.log(_state, _route);
     
-    return false;
-  }
+        return false;
+    }
 }

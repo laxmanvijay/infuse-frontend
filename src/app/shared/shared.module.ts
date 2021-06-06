@@ -10,8 +10,8 @@ import { ContactComponent } from './components/contact/contact.component';
 import { LoaderComponent } from './components/loader/loader.component';
 
 @NgModule({
-  declarations: [PageNotFoundComponent, WebviewDirective, ContactComponent, LoaderComponent],
-  imports: [CommonModule, TranslateModule, FormsModule],
-  exports: [TranslateModule, WebviewDirective, FormsModule, ContactComponent, LoaderComponent]
+    declarations: [PageNotFoundComponent, WebviewDirective, ContactComponent, LoaderComponent],
+    imports: [CommonModule, TranslateModule, FormsModule],
+    exports: [TranslateModule, WebviewDirective, FormsModule, ContactComponent, LoaderComponent]
 })
 export class SharedModule {}

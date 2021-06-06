@@ -1,5 +1,5 @@
 export enum CallState {
-  calling = 'calling',
-  connected = 'connected',
-  failed = 'failed'
+    calling = 'calling',
+    connected = 'connected',
+    failed = 'failed'
 }

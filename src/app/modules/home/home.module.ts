@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { GenerateIdComponent } from './generate-id/generate-id.component';
 
 @NgModule({
-  declarations: [HomeComponent, GenerateIdComponent],
-  imports: [CommonModule, SharedModule, HomeRoutingModule, FormsModule]
+    declarations: [HomeComponent, GenerateIdComponent],
+    imports: [CommonModule, SharedModule, HomeRoutingModule, FormsModule]
 })
 export class HomeModule {}

@@ -7,13 +7,13 @@ import { DrawComponent } from './draw/draw.component';
 
 
 @NgModule({
-  declarations: [
-    CallWindowComponent,
-    DrawComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule
-  ]
+    declarations: [
+        CallWindowComponent,
+        DrawComponent
+    ],
+    imports: [
+        CommonModule,
+        CoreModule
+    ]
 })
 export class CallWindowModule { }
