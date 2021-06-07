@@ -65,10 +65,7 @@ export class ARStickerProcessor implements VideoFrameProcessor {
             if (frameWidth === 0 || frameHeight === 0) {
                 resolve(buffers);
             }
-
-            console.log("frame", frameWidth, frameHeight);
             
-
             this.setDimension(frameWidth, frameHeight);
             this.targetCanvasCtx.drawImage(canvas, 0, 0);
 
