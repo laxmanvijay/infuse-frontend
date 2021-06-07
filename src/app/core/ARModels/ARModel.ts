@@ -16,5 +16,5 @@ export interface IARModel {
 
     addToSceneInitial(scene: THREE.Scene): void;
 
-    placeObject(buffers: VideoFrameBuffer[], renderer: THREE.Renderer, scene: THREE.Scene): Promise<void>;
+    placeObject(buffers: VideoFrameBuffer[], renderer: THREE.Renderer, scene: THREE.Scene, camera: THREE.Camera): Promise<void>;
 }

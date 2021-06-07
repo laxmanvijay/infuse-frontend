@@ -17,6 +17,7 @@ import { CallService } from '../../core/services/call.service';
 })
 export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
 
+
     constructor(private router: Router,private activatedRoute: ActivatedRoute, private location: Location, private callService: CallService, private renderer: Renderer2) { }
 
     private callingAudio: HTMLAudioElement;
@@ -46,6 +47,9 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
     public isConnected = false;
 
     public isMobile = false;
+
+    public isStickerOn = false;
+    public stickerStages: ARStickerProcessor[];
 
     public timeoutExpiryNotifier$ = new Subject<void>();
     public destroyNotifier$ = new Subject<void>();
@@ -339,17 +343,7 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
             const devices = await this.meetingSession.audioVideo.listVideoInputDevices();
             console.log("available devices", devices);
 
-            const model = new SunGlassARModel();
-            await model.loadModel();
-
-            const arProcessor = new ARStickerProcessor(model, this.renderer);
-            arProcessor.init();
-
-            const stages = [arProcessor];
-
-            this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId,stages);
-      
-            await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
+            await this.meetingSession.audioVideo.chooseVideoInputDevice(devices[0].deviceId);
             this.ownContact.tileId = this.meetingSession.audioVideo.startLocalVideoTile();
             console.log("video started", this.ownContact);
             this.isVideoOn = true;
@@ -359,6 +353,33 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log("video turned off");
         }
         console.log("ending toggleVideo with state", this.isVideoOn);
+    }
+
+    async toggleSticker(): Promise<void> {
+        console.log("calling toggleSticker with state", this.isStickerOn);
+        if (this.isVideoOn) {
+            const devices = await this.meetingSession.audioVideo.listVideoInputDevices();
+            if (!this.isStickerOn) {
+
+                const model = new SunGlassARModel("sunglass");
+                await model.loadModel();
+
+                const arProcessor = new ARStickerProcessor(model, this.renderer);
+                arProcessor.init();
+
+                this.stickerStages = [arProcessor];
+
+                this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId, this.stickerStages);
+      
+                await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
+
+                this.isStickerOn = true;
+            } else {
+                await this.meetingSession.audioVideo.chooseVideoInputDevice(devices[0].deviceId);
+                this.isStickerOn = false;
+            }
+        }
+        console.log("ending toggleSticker with state", this.isStickerOn);
     }
 
     clearDrawing(): void {

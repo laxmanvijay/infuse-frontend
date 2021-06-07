@@ -29,7 +29,7 @@
 
     .video-el {
         object-fit: cover;
-        // transform: rotateY(-180deg);
+        transform: rotateY(-180deg);
 
         &.other-video-el {
             height: 100vh;

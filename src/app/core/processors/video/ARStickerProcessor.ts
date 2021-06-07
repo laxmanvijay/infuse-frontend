@@ -29,20 +29,14 @@ export class ARStickerProcessor implements VideoFrameProcessor {
     public model: faceLandmarksDetection.FaceLandmarksPackage;
 
     init(): void {
-
-        this.webglCanvas.width = 900;
+        this.webglCanvas.width = 960;
         this.webglCanvas.height = 540;
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.webglCanvas,
             alpha: true,
         });
-        this.renderer.setSize(900, 540);
-        
+
         this.camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 2000 );
-        this.camera.position.x = 900 / 2;
-        this.camera.position.y = -540 / 2;
-        this.camera.position.z = -( 540 / 2 ) / Math.tan( 45 / 2 );
-        this.camera.lookAt( new THREE.Vector3(900 / 2, -540 / 2, 0) );
 
         this.scene = new THREE.Scene();
         this.scene.add( new THREE.AmbientLight( 0xcccccc ) );
@@ -72,10 +66,13 @@ export class ARStickerProcessor implements VideoFrameProcessor {
                 resolve(buffers);
             }
 
+            console.log("frame", frameWidth, frameHeight);
+            
+
             this.setDimension(frameWidth, frameHeight);
             this.targetCanvasCtx.drawImage(canvas, 0, 0);
 
-            this.stickerModel.placeObject(buffers,this.renderer,this.scene);
+            this.stickerModel.placeObject(buffers,this.renderer,this.scene, this.camera);
 
             this.renderer.render(this.scene, this.camera);
             this.targetCanvasCtx.drawImage(this.renderer.domElement, 0, 0);
@@ -91,6 +88,12 @@ export class ARStickerProcessor implements VideoFrameProcessor {
             this.targetCanvas.height = frameHeight;
             this.webglCanvas.width = frameWidth;
             this.webglCanvas.height = frameHeight;
+
+            this.camera.position.x = this.webglCanvas.width / 2;
+            this.camera.position.y = -this.webglCanvas.height / 2;
+            this.camera.position.z = -( this.webglCanvas.height / 2 ) / Math.tan( 45 / 2 );
+            this.camera.lookAt( new THREE.Vector3(this.webglCanvas.width / 2, -this.webglCanvas.height / 2, 0) );
+
             this.isDimensionsSet = true;
         }
     }

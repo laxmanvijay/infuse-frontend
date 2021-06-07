@@ -6,7 +6,7 @@ import { CanvasVideoFrameBuffer, VideoFrameBuffer } from "amazon-chime-sdk-js";
 
 export class SunGlassARModel implements IARModel {
 
-    modelName = "sunglass";
+    constructor(public modelName: string) {}
 
     loader = new GLTFLoader();
 
@@ -38,20 +38,20 @@ export class SunGlassARModel implements IARModel {
         scene.add(this.model3D.scene);
     }
 
-    placeObject(buffers: VideoFrameBuffer[], renderer: THREE.Renderer, scene: THREE.Scene): Promise<void> {
+    placeObject(buffers: VideoFrameBuffer[], renderer: THREE.Renderer, scene: THREE.Scene, camera: THREE.Camera): Promise<void> {
 
         return new Promise((resolve) => {
             this.modelML.estimateFaces({
                 input: <HTMLCanvasElement>buffers[0].asCanvasElement(),
-                flipHorizontal: false,
-                returnTensors: false
+                flipHorizontal: true,
+                returnTensors: false,
             }).then((predictions) => {
                 
                 const prediction: any = predictions[0];
                     
                 this.model3D.scene.position.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ];
                 this.model3D.scene.position.y = -prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ];
-                this.model3D.scene.position.z = -prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - 20;
+                this.model3D.scene.position.z = prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - camera.position.z;
 
                 this.model3D.scene.up.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ] - prediction.annotations.noseBottom[ 0 ][ 0 ];
                 this.model3D.scene.up.y = -( prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ] - prediction.annotations.noseBottom[ 0 ][ 1 ] );
@@ -66,9 +66,9 @@ export class SunGlassARModel implements IARModel {
                         ( prediction.annotations.leftEyeUpper1[ 3 ][ 1 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 1 ] ) ** 2 +
                         ( prediction.annotations.leftEyeUpper1[ 3 ][ 2 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 2 ] ) ** 2
                 );
-                this.model3D.scene.scale.x = eyeDist / 6;
-                this.model3D.scene.scale.y = eyeDist / 6;
-                this.model3D.scene.scale.z = eyeDist / 6;
+                this.model3D.scene.scale.x = eyeDist / 18;
+                this.model3D.scene.scale.y = eyeDist / 18;
+                this.model3D.scene.scale.z = eyeDist / 18;
     
                 this.model3D.scene.rotation.y = Math.PI;
                 this.model3D.scene.rotation.z = Math.PI / 2 - Math.acos( this.model3D.scene.up.x );
