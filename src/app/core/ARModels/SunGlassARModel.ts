@@ -48,31 +48,33 @@ export class SunGlassARModel implements IARModel {
             }).then((predictions) => {
                 
                 const prediction: any = predictions[0];
+                
+                if (prediction) {
                     
-                this.model3D.scene.position.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ];
-                this.model3D.scene.position.y = -prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ];
-                this.model3D.scene.position.z = prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - camera.position.z;
+                    this.model3D.scene.position.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ];
+                    this.model3D.scene.position.y = -prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ];
+                    this.model3D.scene.position.z = prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - camera.position.z;
 
-                this.model3D.scene.up.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ] - prediction.annotations.noseBottom[ 0 ][ 0 ];
-                this.model3D.scene.up.y = -( prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ] - prediction.annotations.noseBottom[ 0 ][ 1 ] );
-                this.model3D.scene.up.z = prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - prediction.annotations.noseBottom[ 0 ][ 2 ];
-                const length = Math.sqrt( this.model3D.scene.up.x ** 2 + this.model3D.scene.up.y ** 2 + this.model3D.scene.up.z ** 2 );
-                this.model3D.scene.up.x /= length;
-                this.model3D.scene.up.y /= length;
-                this.model3D.scene.up.z /= length;
+                    this.model3D.scene.up.x = prediction.annotations.midwayBetweenEyes[ 0 ][ 0 ] - prediction.annotations.noseBottom[ 0 ][ 0 ];
+                    this.model3D.scene.up.y = -( prediction.annotations.midwayBetweenEyes[ 0 ][ 1 ] - prediction.annotations.noseBottom[ 0 ][ 1 ] );
+                    this.model3D.scene.up.z = prediction.annotations.midwayBetweenEyes[ 0 ][ 2 ] - prediction.annotations.noseBottom[ 0 ][ 2 ];
+                    const length = Math.sqrt( this.model3D.scene.up.x ** 2 + this.model3D.scene.up.y ** 2 + this.model3D.scene.up.z ** 2 );
+                    this.model3D.scene.up.x /= length;
+                    this.model3D.scene.up.y /= length;
+                    this.model3D.scene.up.z /= length;
 
-                const eyeDist = Math.sqrt(
-                    ( prediction.annotations.leftEyeUpper1[ 3 ][ 0 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 0 ] ) ** 2 +
+                    const eyeDist = Math.sqrt(
+                        ( prediction.annotations.leftEyeUpper1[ 3 ][ 0 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 0 ] ) ** 2 +
                         ( prediction.annotations.leftEyeUpper1[ 3 ][ 1 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 1 ] ) ** 2 +
                         ( prediction.annotations.leftEyeUpper1[ 3 ][ 2 ] - prediction.annotations.rightEyeUpper1[ 3 ][ 2 ] ) ** 2
-                );
-                this.model3D.scene.scale.x = eyeDist / 18;
-                this.model3D.scene.scale.y = eyeDist / 18;
-                this.model3D.scene.scale.z = eyeDist / 18;
+                    );
+                    this.model3D.scene.scale.x = eyeDist / 18;
+                    this.model3D.scene.scale.y = eyeDist / 18;
+                    this.model3D.scene.scale.z = eyeDist / 18;
     
-                this.model3D.scene.rotation.y = Math.PI;
-                this.model3D.scene.rotation.z = Math.PI / 2 - Math.acos( this.model3D.scene.up.x );
-                
+                    this.model3D.scene.rotation.y = Math.PI;
+                    this.model3D.scene.rotation.z = Math.PI / 2 - Math.acos( this.model3D.scene.up.x );
+                }
                 resolve(null);
             }).catch((err) => {
                 console.log(err);

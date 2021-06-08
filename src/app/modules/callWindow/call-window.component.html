@@ -32,6 +32,10 @@
                 <img src="assets/icons/ar.svg" alt="" *ngIf="!isStickerOn">
                 <img src="assets/icons/ar.svg" alt="" *ngIf="isStickerOn" style="filter: var(--filter-green)">
             </div>
+            <div *ngIf="!isMobile && isVideoOn" class="control" (click)="toggleBackgroundBlur()">
+                <img src="assets/icons/blur_off.svg" alt="" *ngIf="!isBackgroundBlurOn">
+                <img src="assets/icons/blur_on.svg" alt="" *ngIf="isBackgroundBlurOn" style="filter: var(--filter-green)">
+            </div>
         </ng-container>
         <div class="control call-end" (click)="setStatusText('Disconnected...');backToHome()">
             <img src="assets/icons/call_end.svg" alt="">

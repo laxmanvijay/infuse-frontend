@@ -1,13 +1,14 @@
 import { Location } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AudioVideoObserver, ContentShareObserver, DefaultModality, DefaultVideoTransformDevice, MeetingSession, VideoTransformDevice } from 'amazon-chime-sdk-js';
+import { AudioVideoObserver, ContentShareObserver, DefaultModality, DefaultVideoTransformDevice, MeetingSession, VideoFrameProcessor, VideoTransformDevice } from 'amazon-chime-sdk-js';
 import { of, Subject } from 'rxjs';
 import { delay, switchMap, tap } from 'rxjs/operators';
 import { SunGlassARModel } from '../../core/ARModels/SunGlassARModel';
 import { CallState } from '../../core/constants/callWindow.constants';
 import { IContact, TypeOfMessage } from '../../core/models/call.models';
 import { ARStickerProcessor } from '../../core/processors/video/ARStickerProcessor';
+import { VideoBackgroundChangeProcessor } from '../../core/processors/video/VideoBackgroundChangeProcessor';
 import { CallService } from '../../core/services/call.service';
 
 @Component({
@@ -49,7 +50,9 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
     public isMobile = false;
 
     public isStickerOn = false;
-    public stickerStages: ARStickerProcessor[];
+    public videoProcessingStages: VideoFrameProcessor[] = [];
+
+    public isBackgroundBlurOn = false;
 
     public timeoutExpiryNotifier$ = new Subject<void>();
     public destroyNotifier$ = new Subject<void>();
@@ -100,6 +103,14 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
                         this.meetingSession.audioVideo.bindVideoElement(tileState.tileId, this.otherVideoElement.nativeElement);
                     this.isOtherVideoOn = true;
                 }
+            }
+        },
+        connectionDidSuggestStopVideo: () => {
+            this.meetingSession.audioVideo.stopLocalVideoTile();
+        },
+        connectionDidBecomeGood: () => {
+            if (this.isVideoOn) {
+                this.meetingSession.audioVideo.startLocalVideoTile();
             }
         },
         videoTileWasRemoved: tileId => {
@@ -342,8 +353,14 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.isVideoOn) {
             const devices = await this.meetingSession.audioVideo.listVideoInputDevices();
             console.log("available devices", devices);
+            this.videoProcessingStages = [];
+            this.isStickerOn = false;
+            this.isBackgroundBlurOn = false;
+            
+            this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId, this.videoProcessingStages);
+      
+            await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
 
-            await this.meetingSession.audioVideo.chooseVideoInputDevice(devices[0].deviceId);
             this.ownContact.tileId = this.meetingSession.audioVideo.startLocalVideoTile();
             console.log("video started", this.ownContact);
             this.isVideoOn = true;
@@ -367,16 +384,36 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
                 const arProcessor = new ARStickerProcessor(model, this.renderer);
                 arProcessor.init();
 
-                this.stickerStages = [arProcessor];
-
-                this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId, this.stickerStages);
-      
-                await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
+                this.videoProcessingStages.push(arProcessor);
 
                 this.isStickerOn = true;
             } else {
-                await this.meetingSession.audioVideo.chooseVideoInputDevice(devices[0].deviceId);
+                this.videoProcessingStages = this.videoProcessingStages.filter(x => !(x instanceof ARStickerProcessor)).slice();
+                this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId, this.videoProcessingStages);
+                await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
                 this.isStickerOn = false;
+            }
+        }
+        console.log("ending toggleSticker with state", this.isStickerOn);
+    }
+
+    async toggleBackgroundBlur(): Promise<void> {
+        console.log("calling toggleSticker with state", this.isStickerOn);
+        if (this.isVideoOn) {
+            const devices = await this.meetingSession.audioVideo.listVideoInputDevices();
+            if (!this.isBackgroundBlurOn) {
+
+                const bgChangeProcessor = new VideoBackgroundChangeProcessor(this.renderer);
+                await bgChangeProcessor.init();
+
+                this.videoProcessingStages.push(bgChangeProcessor);
+
+                this.isBackgroundBlurOn = true;
+            } else {
+                this.videoProcessingStages = this.videoProcessingStages.filter(x => !(x instanceof VideoBackgroundChangeProcessor)).slice();
+                this.ARVideoTransformDevice = new DefaultVideoTransformDevice(this.meetingSession.logger,devices[0].deviceId, this.videoProcessingStages);
+                await this.meetingSession.audioVideo.chooseVideoInputDevice(this.ARVideoTransformDevice);
+                this.isBackgroundBlurOn = false;
             }
         }
         console.log("ending toggleSticker with state", this.isStickerOn);

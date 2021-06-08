@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@electron/remote": "1.0.4",
+    "@tensorflow-models/body-pix": "2.2.0",
     "@tensorflow-models/face-landmarks-detection": "0.0.1",
     "@tensorflow/tfjs-backend-webgl": "2.8.6",
     "@tensorflow/tfjs-converter": "2.8.6",
