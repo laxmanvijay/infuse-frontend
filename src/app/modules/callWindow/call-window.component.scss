@@ -152,6 +152,7 @@
 
 @media screen and (max-width: 500px) {
     .video-el {
+        object-fit: contain;
         &.own-video-el {
             min-width: 20vw;
         }
