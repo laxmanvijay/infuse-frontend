@@ -28,8 +28,8 @@
     }
 
     .video-el {
-        object-fit: cover;
         transform: rotateY(-180deg);
+        background: black;
 
         &.other-video-el {
             height: 100vh;
@@ -38,6 +38,7 @@
             top: 0;
             left: 0;
             z-index: -1;
+            object-fit: cover;
 
             &.screen-share {
                 transform: none;
@@ -55,6 +56,7 @@
             z-index: 1;
             border: 4px solid white;
             border-radius: 5px;
+            object-fit: cover;
         }
     }
 
@@ -152,7 +154,11 @@
 
 @media screen and (max-width: 500px) {
     .video-el {
-        object-fit: contain;
+
+        &.other-video-el {
+            object-fit: contain !important;
+        }
+
         &.own-video-el {
             min-width: 20vw;
         }
