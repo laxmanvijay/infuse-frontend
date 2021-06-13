@@ -10,12 +10,21 @@ export enum TypeOfMessage {
     callAcceptedAndMeetingCreated = "callAcceptedAndMeetingCreated",
     createMeeting = "createMeeting",
     joinMeeting = "joinMeeting",
-    directJoinLink = "directJoinLink"
+    directJoinLink = "directJoinLink",
+    recordingStart = "recordingStart",
+    recordingStop = "recordingStop"
 }
 
 export enum MeetingType {
     directLink = "directLink",
     callAndJoin = "callAndJoin"
+}
+
+export interface IRecordingData {
+    meetingId: string,
+    taskId?: string,
+    recordState: TypeOfMessage,
+    recordingUrl?: string
 }
 
 export interface IContact {

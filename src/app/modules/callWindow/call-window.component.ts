@@ -10,6 +10,7 @@ import { IContact, MeetingType, TypeOfMessage } from '../../core/models/call.mod
 import { ARStickerProcessor } from '../../core/processors/video/ARStickerProcessor';
 import { VideoBackgroundChangeProcessor } from '../../core/processors/video/VideoBackgroundChangeProcessor';
 import { CallService } from '../../core/services/call.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-call-window',
@@ -17,6 +18,7 @@ import { CallService } from '../../core/services/call.service';
     styleUrls: ['./call-window.component.scss']
 })
 export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
+    isRecording: boolean;
 
 
     constructor(private router: Router,private activatedRoute: ActivatedRoute, private location: Location, private callService: CallService, private renderer: Renderer2) { }
@@ -455,6 +457,34 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
         console.log("ending toggleSticker with state", this.isStickerOn);
+    }
+
+    async toggleRecord(): Promise<void> {
+        console.log("calling toggleRecord with state", this.isRecording);
+        if (!this.isRecording) {
+
+            const res = await this.callService.startOrStopRecording({
+                meetingId: this.meetingSession.configuration.meetingId,
+                recordState: TypeOfMessage.recordingStart
+            }).toPromise();
+
+            this.callService.recordingTaskId = res.taskId;
+
+            this.isRecording = true;
+        } else {           
+            const res = await this.callService.startOrStopRecording({
+                meetingId: this.meetingSession.configuration.meetingId,
+                taskId: this.callService.recordingTaskId,
+                recordState: TypeOfMessage.recordingStop
+            }).toPromise();
+
+            this.isRecording = false;
+            this.callService.recordingTaskId = undefined;
+
+            FileSaver.saveAs(res.recordingUrl,"call_recording.mp4");
+
+        }
+        console.log("ending toggleRecord with state", this.isRecording);
     }
 
     clearDrawing(): void {

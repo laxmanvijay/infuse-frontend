@@ -36,6 +36,10 @@
                 <img src="assets/icons/blur_off.svg" alt="" *ngIf="!isBackgroundBlurOn">
                 <img src="assets/icons/blur_on.svg" alt="" *ngIf="isBackgroundBlurOn" style="filter: var(--filter-green)">
             </div>
+            <div class="control" (click)="toggleRecord()">
+                <img src="assets/icons/record.svg" alt="" *ngIf="!isRecording">
+                <img src="assets/icons/record.svg" alt="" *ngIf="isRecording" style="filter: var(--filter-green)">
+            </div>
         </ng-container>
         <div class="control call-end" (click)="setStatusText('Disconnected...');backToHome()">
             <img src="assets/icons/call_end.svg" alt="">
