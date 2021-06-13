@@ -9,7 +9,13 @@ export enum TypeOfMessage {
     reject = "reject",
     callAcceptedAndMeetingCreated = "callAcceptedAndMeetingCreated",
     createMeeting = "createMeeting",
-    joinMeeting = "joinMeeting"
+    joinMeeting = "joinMeeting",
+    directJoinLink = "directJoinLink"
+}
+
+export enum MeetingType {
+    directLink = "directLink",
+    callAndJoin = "callAndJoin"
 }
 
 export interface IContact {

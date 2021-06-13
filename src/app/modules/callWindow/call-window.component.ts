@@ -6,7 +6,7 @@ import { of, Subject } from 'rxjs';
 import { delay, switchMap, tap } from 'rxjs/operators';
 import { SunGlassARModel } from '../../core/ARModels/SunGlassARModel';
 import { CallState } from '../../core/constants/callWindow.constants';
-import { IContact, TypeOfMessage } from '../../core/models/call.models';
+import { IContact, MeetingType, TypeOfMessage } from '../../core/models/call.models';
 import { ARStickerProcessor } from '../../core/processors/video/ARStickerProcessor';
 import { VideoBackgroundChangeProcessor } from '../../core/processors/video/VideoBackgroundChangeProcessor';
 import { CallService } from '../../core/services/call.service';
@@ -139,6 +139,44 @@ export class CallWindowComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     ngOnInit(): void {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = {};
+        for (const [k,v] of urlSearchParams.entries()) {
+            params[k] = v;
+        }
+        console.log("direct join link", params);
+        
+        if (params['directlink'] && params['meetingid']) {
+            this.callService.createOrJoinMeeting({
+                type: TypeOfMessage.joinMeeting,
+                data: {
+                    meetingId: params['meetingid'],   
+                    calleeId: {
+                        attendeeId: MeetingType.directLink
+                    },
+                    callerId: {
+                        attendeeId: MeetingType.directLink
+                    }
+                },
+                id: MeetingType.directLink
+            }).pipe(
+                tap(y => {
+                    this.callService.meeting = y.meetingData.Info.Meeting;
+                    this.callService.attendee = y.meetingData.Info.Attendee;
+                }),
+                switchMap(() => this.callService.constructMeeting(MeetingType.directLink))
+            ).subscribe(y => {
+                this.meetingSession = y;
+                this.meetingSession.audioVideo.bindAudioElement(<HTMLAudioElement>document.getElementById("audio-el"));
+                this.meetingSession.audioVideo.start();
+                this.isAudioOn = !this.meetingSession.audioVideo.realtimeIsLocalAudioMuted();
+                this.meetingSession.audioVideo.addObserver(this.observer);
+                this.setStatusText("Call Connected...");
+                console.log("joined meeting", this.meetingSession);
+                this.isConnected = true;
+            });
+            return;
+        }
         this.callingAudio = new Audio('assets/audio/calling-sound.mp3');
         this.contacts = JSON.parse(localStorage.getItem("contacts"));
         this.callingAudio.addEventListener('ended', function() {

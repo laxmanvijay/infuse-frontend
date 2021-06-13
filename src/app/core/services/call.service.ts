@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AppConfig } from '../../../environments/environment';
-import { IContact, ICreateOrJoinMeetingResponse, IMessage, TypeOfMessage } from '../models/call.models';
+import { IContact, ICreateOrJoinMeetingResponse, IMessage, MeetingType, TypeOfMessage } from '../models/call.models';
 
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -60,17 +60,19 @@ export class CallService {
         return this.http.post<ICreateOrJoinMeetingResponse>(AppConfig.api_url + '/meeting/create', body);
     }
 
-    public async constructMeeting(): Promise<MeetingSession> {
+    public async constructMeeting(meetingType: MeetingType = MeetingType.callAndJoin): Promise<MeetingSession> {
 
         this.configuration = new MeetingSessionConfiguration(this.meeting, this.attendee);
     
         this.meetingSession = new DefaultMeetingSession(this.configuration, this.logger, this.deviceController);
 
-        try {
-            const audioInputs = await this.meetingSession.audioVideo.listAudioInputDevices();
-            await this.meetingSession.audioVideo.chooseAudioInputDevice(audioInputs[0].deviceId);
-        } catch (err) {
-            console.log("unable to attach audio device", err);
+        if (meetingType !== MeetingType.directLink) {
+            try {
+                const audioInputs = await this.meetingSession.audioVideo.listAudioInputDevices();
+                await this.meetingSession.audioVideo.chooseAudioInputDevice(audioInputs[0].deviceId);
+            } catch (err) {
+                console.log("unable to attach audio device", err);
+            }
         }
 
         return this.meetingSession;
