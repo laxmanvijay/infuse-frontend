@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     constructor(private router: Router, private homeService: HomeHttpService) {}
 
     canActivate(_route: ActivatedRouteSnapshot, _state:RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        if (_route.queryParamMap.get('directLink') && _route.queryParamMap.get('meetingId')) {
+        if (_route.queryParams.directLink && _route.queryParams.meetingId) {
             return true;
         }
         if (localStorage.getItem("id") != undefined && localStorage.getItem("hashedId") != undefined) {
