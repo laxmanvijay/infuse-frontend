@@ -53,8 +53,16 @@ export class CallService {
     private configuration: MeetingSessionConfiguration;
 
     public getSocketConnection(id?: string): WebSocketSubject<IMessage> {
-        if (this.socket$ == undefined)
+        if (this.socket$ == undefined){
             this.socket$ = new WebSocketSubject<IMessage>(AppConfig.ws_url + '?id=' + id);
+            setInterval(() => {
+                this.socket$.next({
+                    type: TypeOfMessage.ping,
+                    data: { callState: TypeOfMessage.ping },
+                    id: localStorage.getItem('id')
+                });
+            }, 10000);
+        }
         return this.socket$;
     }
 

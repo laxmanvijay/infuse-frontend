@@ -12,7 +12,8 @@ export enum TypeOfMessage {
     joinMeeting = "joinMeeting",
     directJoinLink = "directJoinLink",
     recordingStart = "recordingStart",
-    recordingStop = "recordingStop"
+    recordingStop = "recordingStop",
+    ping = "ping"
 }
 
 export enum MeetingType {
